@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube</title>
+    <link rel="icon" href="https://img.icons8.com/color/48/000000/youtube-play.png" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <nav class="flex-div">
+        <div class="nav-left flex-div">
+            <img src="/img/menu.png" alt="" class="menu-icon" />
+            <img src="/img/logo.png" alt="" class="logo" />
+        </div>
+        <div class="nav-middle flex-div">
+            <div class="search-box flex-div">
+                <input type="text" placeholder="Search" id="userInput" />
+                <img src="/img/search.png" alt="" id="searchvideo" onclick="relatedVideos()" />
+            </div>
+            <img src="/img/voice-search.png" alt="" class="mic-icon" />
+        </div>
+        <div class="nav-right flex-div">
+            <img src="/img/upload.png" alt="" />
+            <img src="/img/more.png" alt="" />
+            <img src="/img/notification.png" alt="" />
+            <img src="/img/profile-pic.jpg" alt="" class="user-icon" />
+        </div>
+    </nav>
+
+    <!---------------- Sidebar--------------->
+    <div class="sidebar">
+        <div class="shortcut-links">
+            <a href=""><img src="/img/home.png" alt="" />
+                <p>Home</p>
+            </a>
+            <a href=""><img src="/img/explore.png" alt="" />
+                <p>Explore</p>
+            </a>
+            <a href=""><img src="/img/subscriprion.png" alt="" />
+                <p>Subscriprion</p>
+            </a>
+            <a href=""><img src="/img/library.png" alt="" />
+                <p>Library</p>
+            </a>
+            <a href=""><img src="/img/history.png" alt="" />
+                <p>History</p>
+            </a>
+            <a href=""><img src="/img/playlist.png" alt="" />
+                <p>Playlist</p>
+            </a>
+            <a href=""><img src="/img/messages.png" alt="" />
+                <p>messages</p>
+            </a>
+            <a href=""><img src="/img/more.png" alt="" />
+                <p>Show More</p>
+            </a>
+            <hr />
+        </div>
+        <div class="subsribed-list">
+            <h3>SUBSCRIBED</h3>
+            <a href=""><img src="img/akshay.jpg" alt="" />
+                <p>Akshay Kumar</p>
+            </a>
+            <a href=""><img src="img/simon.png" alt="" />
+                <p>Sudhanshu</p>
+            </a>
+            <a href=""><img src="img/tom.png" alt="" />
+                <p>Jaky</p>
+            </a>
+            <a href=""><img src="img/megan.png" alt="" />
+                <p>Megan</p>
+            </a>
+            <a href=""><img src="img/profile-pic.jpg" alt="" />
+                <p>Rishi Anand</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- ------------main--------------- -->
+
+    <div class="container">
+        <div class="list-container"></div>
+    </div>
+</body>
+
+</html>
+
+<script src="script.js"></script>

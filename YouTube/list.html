@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>list</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<style>
+    .video-info-div {
+        display: flex;
+        width: 90%;
+        margin: 15px auto;
+        padding: 10px;
+        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    }
+    /* .info-div {
+        display: flex;
+        flex-direction: column;
+        margin-left: 10px;
+    } */
+    
+    .info-div {
+        margin-left: 10px;
+        overflow: hidden;
+    }
+    
+    .info-div img {
+        width: 60px;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+    
+    .icon-views-name {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+    }
+    
+    .icon-views-name span {
+        margin: 15px;
+        color: gray;
+    }
+</style>
+
+<body>
+    <nav class="flex-div">
+        <div class="nav-left flex-div">
+            <!-- <img src="/img/menu.png" alt="" class="menu-icon" /> -->
+            <img src="/img/logo.png" alt="" class="logo" />
+        </div>
+        <div class="nav-middle flex-div">
+            <div class="search-box flex-div">
+                <input type="text" placeholder="Search" />
+                <img src="/img/search.png" alt="" />
+            </div>
+            <img src="/img/voice-search.png" alt="" class="mic-icon" />
+        </div>
+        <div class="nav-right flex-div">
+            <img src="/img/upload.png" alt="" />
+            <img src="/img/more.png" alt="" />
+            <img src="/img/notification.png" alt="" />
+            <img src="/img/profile-pic.jpg" alt="" class="user-icon" />
+        </div>
+    </nav>
+    <div id="showresult"></div>
+</body>
+
+</html>
+<script>
+    let input = localStorage.getItem("user-input");
+    console.log(input);
+    let key = "AIzaSyBDOYBgOHZ9n4fgDx5sgTXSgrP-lt_BrO8";
+    const getData = async() => {
+        try {
+            let res = await fetch(
+                `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&order=viewCount&q=${input}&type=video&key=${key}`
+            );
+            let data = await res.json();
+            data.items.forEach(function(videoitems) {
+                getChannelIcon(videoitems);
+            });
+        } catch (error) {
+            console.log("err", error);
+        }
+    };
+    getData();
+
+    const getChannelIcon = async(video_data) => {
+        try {
+            let res1 = await fetch(
+                ` https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${video_data.snippet.channelId}&key=${key}`
+            );
+            let data1 = await res1.json();
+            video_data["stat"] = data1.items[0];
+            console.log(video_data);
+
+            appendData(video_data);
+        } catch (error) {
+            console.log("err", error);
+        }
+    };
+
+    function appendData(video) {
+        let div = document.createElement("div");
+        div.setAttribute("class", "video-info-div");
+
+        div.addEventListener("click", () => {
+            localStorage.setItem("videoArray", JSON.stringify(video));
+            window.location.href = "playvideo.html";
+        });
+
+        let thumbnail = document.createElement("img");
+        thumbnail.src = video.snippet.thumbnails.medium.url;
+
+        let info_div = document.createElement("div");
+        info_div.setAttribute("class", "info-div");
+        let title = document.createElement("p");
+        title.textContent = video.snippet.title;
+        let icon_div = document.createElement("div");
+        icon_div.setAttribute("class", "icon-views-name");
+
+        let icon = document.createElement("img");
+        icon.src = video.stat.snippet.thumbnails.default.url;
+        let chan_name = document.createElement("span");
+        chan_name.textContent = video.snippet.channelTitle;
+        let views = document.createElement("p");
+        views.textContent = `${Math.floor(
+      Number(video.stat.statistics.viewCount) / 1000000
+    )}K`;
+        icon_div.append(icon, chan_name, views);
+        info_div.append(title, icon_div);
+        div.append(thumbnail, info_div);
+        document.querySelector("#showresult").append(div);
+    }
+</script>

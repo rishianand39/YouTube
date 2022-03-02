@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Play Video</title>
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+<style>
+    #showvideo {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    iframe {
+        width: 100%;
+        height: 400px;
+    }
+    
+    #mainVideo {
+        /* border: 1px solid red; */
+        width: 58%;
+        margin: 15px 1%;
+    }
+    
+    #relatedVideo {
+        width: 38%;
+        border: 1px solid teal;
+        margin: 15px 1%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #relatedVideo .related-video-div {
+        display: flex;
+        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+        margin: 2%;
+        /* border: 1px solid red; */
+    }
+    
+    #relatedVideo img {
+        width: 40%;
+    }
+    
+    .related-video-div .info img {
+        /* border: 1px solid red; */
+        width: 1%;
+        /* border-radius: 50%; */
+        display: flex;
+    }
+    
+    .info {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .icon-views {
+        display: flex;
+        align-items: center;
+        margin: 10px 5px;
+    }
+    
+    .chan-icon {
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    
+    .cha-info-main {
+        display: flex;
+        margin: 30px 0;
+        /* border: 1px solid red; */
+        display: flex;
+        align-items: center;
+    }
+    
+    .cha-info-main button {
+        background-color: maroon;
+        padding: 10px 20px;
+        border: 0;
+        margin-left: 30px;
+        color: white;
+        font-size: 18px;
+    }
+    
+    @media only screen and (min-width: 0px) and (max-width: 800px) {
+        #relatedVideo {
+            display: none;
+        }
+        #mainVideo {
+            width: 100%;
+        }
+    }
+</style>
+
+<body>
+    <nav class="flex-div">
+        <div class="nav-left flex-div">
+            <!-- <img src="/img/menu.png" alt="" class="menu-icon" /> -->
+            <img src="/img/logo.png" alt="" class="logo" />
+        </div>
+        <div class="nav-middle flex-div">
+            <div class="search-box flex-div">
+                <input type="text" placeholder="Search" id="userInput" />
+                <img src="/img/search.png" alt="" id="searchvideo" onclick="relatedVideos()" />
+            </div>
+            <img src="/img/voice-search.png" alt="" class="mic-icon" />
+        </div>
+        <div class="nav-right flex-div">
+            <img src="/img/upload.png" alt="" />
+            <img src="/img/more.png" alt="" />
+            <img src="/img/notification.png" alt="" />
+            <img src="/img/profile-pic.jpg" alt="" class="user-icon" />
+        </div>
+    </nav>
+    <div id="showvideo">
+        <div id="mainVideo"></div>
+        <div id="relatedVideo"></div>
+    </div>
+</body>
+
+</html>
+<script>
+    // --------Get clicked video data from localStorage---
+    let data = JSON.parse(localStorage.getItem("videoArray"));
+    // console.log(data);
+
+    function relatedVideos() {
+        let input = document.querySelector("#userInput").value;
+        localStorage.setItem("user-input", input);
+        window.location.href = "list.html";
+    }
+    let key = "AIzaSyBDOYBgOHZ9n4fgDx5sgTXSgrP-lt_BrO8";
+    // ----------------show Clicked Data
+
+    const appendClickedData = (data) => {
+        let div = document.createElement("div");
+        let iframe = document.createElement("iframe");
+        if (typeof data.id == "string") {
+            iframe.src = `https://www.youtube.com/embed/${data.id}`;
+        } else {
+            iframe.src = `https://www.youtube.com/embed/${data.id.videoId}`;
+        }
+        iframe.setAttribute("allowfullscreen", true);
+
+        let cha_info_div = document.createElement("div");
+        cha_info_div.setAttribute("class", "cha-info-main");
+        let titlemain = document.createElement("p");
+        titlemain.textContent = data.snippet.title;
+        let cha_icon = document.createElement("img");
+        cha_icon.setAttribute("class", "chan-icon");
+        cha_icon.src = data.stat.snippet.thumbnails.default.url;
+        let subscribe = document.createElement("button");
+        subscribe.textContent = "SUBSCRIBE";
+        cha_info_div.append(cha_icon, titlemain, subscribe);
+        div.append(iframe, cha_info_div);
+        document.getElementById("mainVideo").append(div);
+    };
+    appendClickedData(data);
+
+    // ----------Fetch Related Data--------------
+    const getRelatedData = async() => {
+        // AIzaSyD22atg10E8U9k5HoSS52K-upYw6zXJ3Ys
+        // AIzaSyDTbOuHmjpdSkvSpUrEgM4j0mxHRW2lVqo
+        let input = JSON.parse(localStorage.getItem("use-input"));
+        try {
+            let res = await fetch(
+                `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&order=viewCount&q=${input}&type=video&key=${key}`
+            );
+            let data = await res.json();
+            data.items.forEach(function(videoitems) {
+                getChannelIcon(videoitems);
+            });
+        } catch (error) {
+            console.log("err", error);
+        }
+    };
+    getRelatedData();
+
+    // ------------Get Channel Icon---------------
+    const getChannelIcon = async(video_data) => {
+        try {
+            let res1 = await fetch(
+                ` https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${video_data.snippet.channelId}&key=${key}`
+            );
+            let data1 = await res1.json();
+            video_data["stat"] = data1.items[0];
+
+            appendRelatedData(video_data);
+        } catch (error) {
+            console.log("err", error);
+        }
+    };
+
+    // --------------append Related Data-----------------
+    function appendRelatedData(video) {
+        // console.log(video);
+        let div = document.createElement("div");
+        div.addEventListener("click", () => {
+            localStorage.setItem("videoArray", JSON.stringify(video));
+            window.location.href = "playvideo.html";
+        });
+
+        div.setAttribute("class", "related-video-div");
+        let thumbnail = document.createElement("img");
+        thumbnail.src = video.snippet.thumbnails.medium.url;
+        let div2 = document.createElement("div");
+        div2.setAttribute("class", "info");
+
+        let title = document.createElement("p");
+        title.textContent = video.snippet.title;
+
+        let channelinfo = document.createElement("div");
+        channelinfo.setAttribute("class", "icon-views");
+
+        let channelIcon = document.createElement("img");
+        channelIcon.style.width = "60px";
+        channelIcon.setAttribute("class", "chan-icon");
+        channelIcon.src = video.stat.snippet.thumbnails.default.url;
+        let views = document.createElement("span");
+        views.textContent = `${Math.floor(Number(video.stat.statistics.viewCount) / 1000000)}K`;
+        channelinfo.append(channelIcon, views);
+        div2.append(title, channelinfo);
+        div.append(thumbnail, div2);
+        document.querySelector("#relatedVideo").append(div);
+    }
+
+    // <iframe width="560" height="315" src="https://www.youtube.com/embed/nel72LyXmXE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</script>
